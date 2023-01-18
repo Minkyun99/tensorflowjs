@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tensorflowjs</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <script>
+      const verbose = true;
+
+      const init = tf.initializers.constant({ value: 7 });
+      console.log(init);
+
+      tf.zeros([4, 4]).print(1);
+
+      scalar(2).print(verbose);
+    </script>
+  </body>
+</html>

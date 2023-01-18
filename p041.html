@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tensorflowjs</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <script>
+      /*메모리 비우기 dispose*/
+      const log = console.log;
+      log(tf.memory());
+
+      const A = tf.tensor([1, 2, 3]);
+      const B = tf.tensor([4, 5, 6]);
+      log(tf.memory());
+
+      A.dispose();
+      log(tf.memory());
+
+      /*메모리 비우기 tidy*/
+      const pp = console.log;
+      const a = tf.tensor([1, 2, 3]);
+      pp(tf.memory);
+      const y = tf.tidy(() => {
+        const result = a.log().neg().round();
+        result.print();
+      });
+      pp(tf.memory());
+    </script>
+  </body>
+</html>

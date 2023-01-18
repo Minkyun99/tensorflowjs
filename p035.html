@@ -23,8 +23,25 @@
         [4, 2]
       );
 
+      const ys = tf.tensor2d([0, 1, 1, 0], [4, 1]);
+
+      function createModel() {
+        const model = tf.sequential();
+        model.add(
+          tf.layers.dense({ units: 1, inputShape: 2, activation: "tanh" })
+        );
+        model.add(tf.layers.dense({ units: 1, activation: "sigmoid" }));
+        model.compile({
+          loss: "binaryCrossentropy",
+          optimizer: "adam",
+          lr: 0.1,
+        });
+        return model;
+      }
+
       const fitParam = {
-        epoochs: 5000,
+        batchSize: 1,
+        epochs: 5000,
         callbacks: {
           onEpochEnd: function (epoch, logs) {
             console.log("epoch", epoch, logs, "RMSE=>", Math.sqrt(logs.loss));
@@ -32,11 +49,13 @@
         },
       };
 
-      const ys = tf.tensor2d([0, 1, 1, 0], [4, 1]);
-
-      model.fit(xs, ys).then(() => {
+      async function createNpredict() {
+        // model = createModel();
+        await model.fit(xs, ys, fitParam);
         model.predict(tf.tensor2d([[0, 1]], [1, 2])).print();
-      });
+      }
+
+      createNpredict();
     </script>
   </body>
 </html>

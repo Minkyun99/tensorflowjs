@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tensorflowjs</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <script>
+      const tem = [29, 30, 31, 32];
+      const xt = tf.tensor(tem);
+
+      tf.loadLayersModel("localstorage://my-model").then((model) => {
+        console.log("이전모델 로드됨");
+        let newResult = model.predict(xt);
+        newResult.print();
+      });
+    </script>
+  </body>
+</html>

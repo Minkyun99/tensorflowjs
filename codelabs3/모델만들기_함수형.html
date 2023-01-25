@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tensorflowjs</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+  </head>
+  <body>
+    <script>
+      let tem1 = [25, 26, 27, 28];
+      let sel = [69, 72, 75, 78];
+      let xt = tf.tensor(tem1);
+
+      let yt = tf.tensor(sel);
+
+      let X = tf.input({ shape: [1] });
+      let Y = tf.layers.dense({ units: 1 }).apply(X);
+      let model = tf.model({ inputs: X, outputs: Y });
+      let compileParam = {
+        optimizer: tf.train.adam(),
+        loss: tf.losses.meanSquaredError,
+      };
+
+      model.compile(compileParam);
+
+      const fitParam = {
+        epochs: 5000,
+        callbacks: {
+          onEpochEnd: function (epoch, logs) {
+            console.log(
+              "epoch : ",
+              epoch,
+              logs,
+              "RMSE =>",
+              Math.sqrt(logs.loss)
+            );
+          },
+        },
+      };
+
+      const my = tf.tensor([31]);
+      model.fit(xt, yt, fitParam).then(function () {
+        let result = model.predict(my);
+        result.print();
+        model.save("localstorage://my-model");
+        console.log("모델 저장됨");
+      });
+    </script>
+  </body>
+</html>

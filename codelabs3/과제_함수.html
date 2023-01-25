@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tensorflowjs</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <script>
+      const B = fetch("./boston.json")
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data.Data[0].CRIM);
+          let C = [];
+          let D = [];
+          for (i = 0; i < data.Data.length; i++) {
+            let A = [];
+            A.push(data.Data[i].CRIM);
+            A.push(data.Data[i].ZN);
+            A.push(data.Data[i].INDUS);
+            A.push(data.Data[i].CHAS);
+            A.push(data.Data[i].NOX);
+            A.push(data.Data[i].RM);
+            A.push(data.Data[i].AGE);
+            A.push(data.Data[i].DIS);
+            A.push(data.Data[i].RAD);
+            A.push(data.Data[i].TAX);
+            A.push(data.Data[i].PTRATIO);
+            A.push(data.Data[i].B);
+            A.push(data.Data[i].LSTAT);
+            C.push(A);
+
+            D.push(data.Data[i].MEDV);
+          }
+          console.log(C, D);
+
+          let xt = tf.tensor(C);
+          let yt = tf.tensor(D);
+
+          let X = tf.input({ shape: [13] });
+          let Y = tf.layers.dense({ units: 1 }).apply(X);
+          let model = tf.model({ inputs: X, outputs: Y });
+          let compileParam = {
+            optimizer: tf.train.adam(),
+            loss: tf.losses.meanSquaredError,
+          };
+
+          model.compile(compileParam);
+
+          const fitParam = {
+            epochs: 10000,
+            callbacks: {
+              onEpochEnd: function (epoch, logs) {
+                console.log(
+                  "epoch : ",
+                  epoch,
+                  logs,
+                  "RMSE =>",
+                  Math.sqrt(logs.loss)
+                );
+              },
+            },
+          };
+          model.summary();
+
+          model.fit(xt, yt, fitParam).then(function () {
+            let result = model.predict(xt);
+            result.print();
+            // model.save("localstorage://my-model");
+            // console.log("모델 저장됨");
+          });
+        });
+
+      //   let mydata = JSON.parse(data);
+      //   console.log(mydata)
+
+      //   let tem1 = [25, 26, 27, 28];
+      //   let sel = [69, 72, 75, 78];
+      //   let xt = tf.tensor(tem1);
+
+      //   let yt = tf.tensor(sel);
+
+      //   let X = tf.input({ shape: [1] });
+      //   let Y = tf.layers.dense({ units: 1 }).apply(X);
+      //   let model = tf.model({ inputs: X, outputs: Y });
+      //   let compileParam = {
+      //     optimizer: tf.train.adam(),
+      //     loss: tf.losses.meanSquaredError,
+      //   };
+
+      //   model.compile(compileParam);
+
+      //   const fitParam = {
+      //     epochs: 5000,
+      //     callbacks: {
+      //       onEpochEnd: function (epoch, logs) {
+      //         console.log(
+      //           "epoch : ",
+      //           epoch,
+      //           logs,
+      //           "RMSE =>",
+      //           Math.sqrt(logs.loss)
+      //         );
+      //       },
+      //     },
+      //   };
+
+      //   const my = tf.tensor([31]);
+      //   model.fit(xt, yt, fitParam).then(function () {
+      //     let result = model.predict(my);
+      //     result.print();
+      //     model.save("localstorage://my-model");
+      //     console.log("모델 저장됨");
+      //   });
+    </script>
+  </body>
+</html>

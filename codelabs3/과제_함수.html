@@ -38,7 +38,6 @@
 
             D.push(data.Data[i].MEDV);
           }
-          console.log(C, D);
 
           let xt = tf.tensor(C);
           let yt = tf.tensor(D);
@@ -54,7 +53,7 @@
           model.compile(compileParam);
 
           const fitParam = {
-            epochs: 10000,
+            epochs: 1000,
             callbacks: {
               onEpochEnd: function (epoch, logs) {
                 console.log(

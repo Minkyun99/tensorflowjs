@@ -39,7 +39,7 @@
               >
                 x
               </div>
-              <img :src="file.preview" />
+              <img :src="file.preview" id="image" />
             </div>
             <div class="file-preview-wrapper-upload">
               <div class="image-box">
@@ -65,12 +65,14 @@
       </div>
     </div>
   </div>
+  <div>{{ analysis }}</div>
 </template>
 
 <script>
 /* eslint-disable */
 
 import axios from "axios";
+// import FileReader from "FileReader";
 
 export default {
   name: "app",
@@ -78,10 +80,13 @@ export default {
     return {
       files: [], //업로드용 파일
       filesPreview: [],
-      uploadImageIndex: 0, // 이미지 업로드를 위한 변수
-      message: "test",
+      uploadImageIndex: 0,
+      analysis: "",
+      url: "",
+      // 이미지 업로드를 위한 변수
     };
   },
+
   methods: {
     imageUpload() {
       console.log(this.$refs.files.files);
@@ -89,6 +94,7 @@ export default {
       // this.files = [...this.files, this.$refs.files.files];
       //하나의 배열로 넣기
       let num = -1;
+
       for (let i = 0; i < this.$refs.files.files.length; i++) {
         this.files = [
           ...this.files,
@@ -111,18 +117,41 @@ export default {
       }
       this.uploadImageIndex = num + 1; //이미지 index의 마지막 값 + 1 저장
       // console.log(this.files);
+      // console.log(this.filesPreview);
+
+      /*mobilenet*/
+      mobilenet.load().then((model) => {
+        const image = document.getElementById("image");
+        // Classify the image.
+        model.classify(image).then((predictions) => {
+          // console.log(predictions);
+          this.analysis = `예상 이름 : ${predictions[0].className},
+            확률 : ${(predictions[0].probability * 100).toFixed(2)}%`;
+        });
+      });
+
+      fetch(this.files.preview)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64data = reader.result;
+            this.url = base64data;
+            console.log(this.url);
+          };
+          reader.readAsDataURL(blob);
+        });
 
       axios({
-        url: "http://localhost:3000",
+        url: "http://localhost:3000/about",
         method: "POST", // 전송방식을 post로 지정
         data: {
-          file: this.message,
+          file: this.url,
         },
       }).then((res) => {
         console.log("1");
         alert(res.data.message);
       });
-      // console.log(this.filesPreview);
     },
 
     imageAddUpload() {
@@ -148,10 +177,11 @@ export default {
         num = i;
       }
       this.uploadImageIndex = this.uploadImageIndex + num + 1;
-
       // console.log(this.files);
       // console.log(this.filesPreview);
     },
+
+    // image_analysis: function () {},
 
     fileDeleteButton(e) {
       const name = e.target.getAttribute("name");

@@ -66,6 +66,7 @@
     </div>
   </div>
   <div>{{ analysis }}</div>
+  <div>{{ url }}</div>
 </template>
 
 <script>
@@ -130,23 +131,24 @@ export default {
         });
       });
 
-      fetch(this.files.preview)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const base64data = reader.result;
-            this.url = base64data;
-            console.log(this.url);
-          };
-          reader.readAsDataURL(blob);
-        });
+      // fetch(this.files.preview)
+      //   .then((res) => res.blob())
+      //   .then((blob) => {
+      //     const reader = new FileReader();
+      //     reader.onload = () => {
+      //       const base64data = reader.result;
+      //       this.url = base64data;
+      //       console.log(this.url);
+      //     };
+      //     reader.readAsDataURL(blob);
+      //   });
 
       axios({
         url: "http://localhost:3000/about",
         method: "POST", // 전송방식을 post로 지정
         data: {
-          file: this.url,
+          // file: this.url,
+          file: "제발",
         },
       }).then((res) => {
         console.log("1");

@@ -66,34 +66,35 @@
     </div>
   </div>
   <div>{{ analysis }}</div>
+  <div>{{ url }}</div>
 </template>
 
 <script>
 /* eslint-disable */
 
-import axios from "axios";
+import axios from 'axios'
 // import FileReader from "FileReader";
 
 export default {
-  name: "app",
+  name: 'app',
   data() {
     return {
       files: [], //업로드용 파일
       filesPreview: [],
       uploadImageIndex: 0,
-      analysis: "",
-      url: "",
+      analysis: '',
+      url: ''
       // 이미지 업로드를 위한 변수
-    };
+    }
   },
 
   methods: {
     imageUpload() {
-      console.log(this.$refs.files.files);
+      console.log(this.$refs.files.files)
 
       // this.files = [...this.files, this.$refs.files.files];
       //하나의 배열로 넣기
-      let num = -1;
+      let num = -1
 
       for (let i = 0; i < this.$refs.files.files.length; i++) {
         this.files = [
@@ -105,61 +106,61 @@ export default {
             //이미지 프리뷰
             preview: URL.createObjectURL(this.$refs.files.files[i]),
             //삭제및 관리를 위한 number
-            number: i,
-          },
-        ];
-        num = i;
+            number: i
+          }
+        ]
+        num = i
         //이미지 업로드용 프리뷰
         this.filesPreview = [
           ...this.filesPreview,
-          { file: URL.createObjectURL(this.$refs.files.files[i]), number: i },
-        ];
+          { file: URL.createObjectURL(this.$refs.files.files[i]), number: i }
+        ]
       }
-      this.uploadImageIndex = num + 1; //이미지 index의 마지막 값 + 1 저장
+      this.uploadImageIndex = num + 1 //이미지 index의 마지막 값 + 1 저장
       // console.log(this.files);
       // console.log(this.filesPreview);
 
       /*mobilenet*/
       mobilenet.load().then((model) => {
-        const image = document.getElementById("image");
+        const image = document.getElementById('image')
         // Classify the image.
         model.classify(image).then((predictions) => {
           // console.log(predictions);
           this.analysis = `예상 이름 : ${predictions[0].className},
-            확률 : ${(predictions[0].probability * 100).toFixed(2)}%`;
-        });
-      });
+            확률 : ${(predictions[0].probability * 100).toFixed(2)}%`
+        })
+      })
 
       fetch(this.files.preview)
         .then((res) => res.blob())
         .then((blob) => {
-          const reader = new FileReader();
+          const reader = new FileReader()
           reader.onload = () => {
-            const base64data = reader.result;
-            this.url = base64data;
-            console.log(this.url);
-          };
-          reader.readAsDataURL(blob);
-        });
+            const base64data = reader.result
+            this.url = base64data
+            console.log(this.url)
+          }
+          reader.readAsDataURL(blob)
+        })
 
       axios({
-        url: "http://localhost:3000/about",
-        method: "POST", // 전송방식을 post로 지정
+        url: 'http://localhost:3000/about',
+        method: 'POST', // 전송방식을 post로 지정
         data: {
-          file: this.url,
-        },
+          file: this.url
+        }
       }).then((res) => {
-        console.log("1");
-        alert(res.data.message);
-      });
+        console.log('1')
+        alert(res.data.message)
+      })
     },
 
     imageAddUpload() {
-      console.log(this.$refs.files.files);
+      console.log(this.$refs.files.files)
 
       // this.files = [...this.files, this.$refs.files.files];
       //하나의 배열로 넣기c
-      let num = -1;
+      let num = -1
       for (let i = 0; i < this.$refs.files.files.length; i++) {
         // console.log(this.uploadImageIndex);
         this.files = [
@@ -171,12 +172,12 @@ export default {
             //이미지 프리뷰
             preview: URL.createObjectURL(this.$refs.files.files[i]),
             //삭제및 관리를 위한 number
-            number: i + this.uploadImageIndex,
-          },
-        ];
-        num = i;
+            number: i + this.uploadImageIndex
+          }
+        ]
+        num = i
       }
-      this.uploadImageIndex = this.uploadImageIndex + num + 1;
+      this.uploadImageIndex = this.uploadImageIndex + num + 1
       // console.log(this.files);
       // console.log(this.filesPreview);
     },
@@ -184,12 +185,12 @@ export default {
     // image_analysis: function () {},
 
     fileDeleteButton(e) {
-      const name = e.target.getAttribute("name");
-      this.files = this.files.filter((data) => data.number !== Number(name));
+      const name = e.target.getAttribute('name')
+      this.files = this.files.filter((data) => data.number !== Number(name))
       // console.log(this.files);
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style>
@@ -403,7 +404,7 @@ export default {
   text-align: center;
 }
 
-.image-box input[type="file"] {
+.image-box input[type='file'] {
   position: absolute;
   width: 0;
   height: 0;

@@ -1,13 +1,10 @@
 const express = require("express");
+const history = require("connect-history-api-fallback");
 const path = require("path");
 const logger = require("morgan");
-// const Photo = require("./public/ori.js");
-// const { Server } = require("socket.io");
-// const http = require("http");
+
 const app = express();
-// const server = http.createServer(app);
-// const io = new Server(server);
-// const io = require('soket.io').listen(Server)
+app.use(history());
 
 require("dotenv").config();
 const port = 3000;
@@ -17,24 +14,40 @@ console.log(_path);
 app.use("/", express.static(_path));
 app.use(logger("tiny"));
 
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-const Photo = require("./public/ori.js");
+const Photo = require("./photo.js");
+const { url } = require("inspector");
+
+app.use(
+  express.json({
+    limit: "50mb",
+  })
+);
+app.use(
+  express.urlencoded({
+    limit: "50mb",
+    extended: false,
+  })
+);
 
 app.post("/about", function (req, res) {
   // front 서버에서 post 방식으로 전송받음
-  console.log("왔냐");
-  // console.log(req.body.file);
+  const A = req.body.name;
+  console.log(A);
+
   const main = async () => {
     const _data = {
-      // url: req.body.file,
-      url: "???",
+      url: A,
     };
-    // console.log(req.body.file);
+    console.log("왔냐");
+    console.log(req.body);
+    console.log("왔냐2");
     const new_photo = new Photo(_data);
     const t = await new_photo.save();
   };
+
   main();
 });
 

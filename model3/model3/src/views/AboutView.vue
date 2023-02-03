@@ -1,72 +1,88 @@
 <template>
-  <div class="main-container">
-    <div class="room-deal-information-container">
-      <div class="room-deal-information-title">사진 등록</div>
-      <div class="room-file-upload-wrapper">
-        <div v-if="!files.length" class="room-file-upload-example-container">
-          <div class="room-file-upload-example">
-            <div class="room-file-image-example-wrapper">이미지</div>
-            <div class="room-file-notice-item room-file-upload-button">
-              <div class="image-box">
-                <!-- <div class="image-profile">
+  <div class="container">
+    <div
+      class="file-upload-container"
+      @dragenter="onDragenter()"
+      @dragover="onDragover()"
+      @dragleave="onDragleave()"
+      @drop="onDrop()"
+      @click="onClick()"
+    >
+      <div class="file-upload" :class="isDragged ? 'dragged' : ''">
+        Drag & Drop Files
+      </div>
+    </div>
+  </div>
+
+  <div class="room-deal-information-title">사진 등록</div>
+  <div v-if="!files.length" class="room-file-upload-example-container">
+    <div class="room-file-upload-example">
+      <div class="room-file-image-example-wrapper">이미지</div>
+      <div class="room-file-notice-item room-file-upload-button">
+        <div class="image-box">
+          <!-- <div class="image-profile">
             <img :src="profileImage" />
             </div>-->
-                <label for="file">사진 등록</label>
-                <v-form ref="form" @submit.prevent="send">
-                  <input
-                    type="file"
-                    id="file"
-                    ref="files"
-                    @change="imageUpload"
-                    multiple
-                  />
-                </v-form>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-else class="file-preview-content-container">
-          <div class="file-preview-container">
-            <div
-              v-for="(file, index) in files"
-              :key="index"
-              class="file-preview-wrapper"
+          <label for="file"
+            >사진 등록
+            <!-- ref="form" -->
+            <form
+              method="post"
+              @submit.prevent="send"
+              encType="multipart/form-data"
             >
-              <div
-                class="file-close-button"
-                @click="fileDeleteButton"
-                :name="file.number"
-              >
-                x
-              </div>
-              <img :src="file.preview" id="image" />
-            </div>
-            <div class="file-preview-wrapper-upload">
-              <div class="image-box">
-                <label for="file">추가 사진 등록</label>
-                <input
-                  type="file"
-                  id="file"
-                  ref="files"
-                  @change="imageAddUpload"
-                  multiple
-                />
-              </div>
-              <div
-                class="file-close-button"
-                @click="fileDeleteButton"
-                :name="files.number"
-              >
-                x
-              </div>
-            </div>
-          </div>
+              <input
+                class="image_Data"
+                type="file"
+                id="file"
+                ref="files"
+                @change="imageUpload()"
+                multiple
+              />
+            </form>
+          </label>
         </div>
       </div>
     </div>
   </div>
+  <div v-else class="file-preview-content-container">
+    <div class="file-preview-container">
+      <div
+        v-for="(file, index) in files"
+        :key="index"
+        class="file-preview-wrapper"
+      >
+        <div
+          class="file-close-button"
+          @click="fileDeleteButton()"
+          :name="file.number"
+        >
+          x
+        </div>
+        <img :src="file.preview" id="image" />
+      </div>
+      <div class="file-preview-wrapper-upload">
+        <div class="image-box">
+          <label for="file" class="image_data">추가 사진 등록</label>
+          <input
+            type="file"
+            id="file"
+            ref="files"
+            @change="imageAddUpload()"
+            multiple
+          />
+        </div>
+        <div
+          class="file-close-button"
+          @click="fileDeleteButton()"
+          :name="files.number"
+        ></div>
+      </div>
+    </div>
+  </div>
+
   <div>{{ analysis }}</div>
-  <div>{{ url }}</div>
+  <button @click="send()">전송테스트</button>
 </template>
 
 <script>
@@ -84,11 +100,78 @@ export default {
       uploadImageIndex: 0,
       analysis: "",
       url: "",
+      isDragged: "",
+
       // 이미지 업로드를 위한 변수
     };
   },
 
   methods: {
+    onClick() {
+      this.$refs.files.click();
+    },
+    onDragenter(event) {
+      // class 넣기
+      this.isDragged = true;
+    },
+    onDragleave(event) {
+      // class 삭제
+      this.isDragged = false;
+    },
+    onDragover(event) {
+      // 드롭을 허용하도록 prevetDefault() 호출
+      event.preventDefault();
+    },
+    onDrop(event) {
+      // 기본 액션을 막음 (링크 열기같은 것들)
+      event.preventDefault();
+      this.isDragged = false;
+      const files = event.dataTransfer.files;
+      this.addFiles(files);
+    },
+    onFileChange(event) {
+      const files = event.target.files;
+      this.addFiles(files);
+    },
+    async addFiles(files) {
+      for (let i = 0; i < files.length; i++) {
+        const src = await this.readFiles(files[i]);
+        files[i].src = src;
+        this.fileList.push(files[i]);
+      }
+    },
+    // FileReader를 통해 파일을 읽어 thumbnail 영역의 src 값으로 셋팅
+
+    async readFiles(files) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          resolve(e.target.result);
+        };
+        reader.readAsDataURL(files);
+      });
+    },
+    handleRemove(index) {
+      this.files.splice(index, 1);
+    },
+
+    send: function () {
+      axios({
+        url: "/about",
+        method: "post", // 전송방식을 post로 지정
+        data: { name: this.url },
+      }).then((res) => {
+        console.log("ok", res);
+        alert(res.data.message);
+      });
+    },
+    watch: {
+      url() {
+        send();
+        console.log("변함");
+      },
+    },
+
     imageUpload() {
       console.log(this.$refs.files.files);
 
@@ -115,86 +198,121 @@ export default {
           ...this.filesPreview,
           { file: URL.createObjectURL(this.$refs.files.files[i]), number: i },
         ];
+
+        /*mobilenet*/
+        mobilenet.load().then((model) => {
+          const image = document.getElementById("image");
+          // Classify the image.
+          model.classify(image).then((predictions) => {
+            console.log(predictions);
+            this.analysis = `예상 이름 : ${predictions[0].className},
+              확률 : ${(predictions[0].probability * 100).toFixed(2)}%`;
+          });
+        });
+
+        /*base64*/
+        fetch(URL.createObjectURL(this.$refs.files.files[i]))
+          .then((res) => res.blob())
+          .then((blob) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const base64data = reader.result;
+              this.url = base64data;
+              console.log(this.url);
+            };
+            reader.readAsDataURL(blob);
+          });
       }
       this.uploadImageIndex = num + 1; //이미지 index의 마지막 값 + 1 저장
       // console.log(this.files);
       // console.log(this.filesPreview);
+      // const frm = new FormData();
+      // frm.append("file", this.url);
+      // frm.append("file", "okok");
+
+      // axios({
+      //   url: "/v",
+      //   method: "post", // 전송방식을 post로 지정
+      //   data: { name: "test ok" },
+      // }).then((res) => {
+      //   console.log("ok", res);
+      //   alert(res.data.message);
+      // });
+    },
+  },
+
+  imageAddUpload() {
+    console.log(this.$refs.files.files);
+
+    // this.files = [...this.files, this.$refs.files.files];
+    //하나의 배열로 넣기c
+    let num = -1;
+    for (let i = 0; i < this.$refs.files.files.length; i++) {
+      // console.log(this.uploadImageIndex);
+      this.files = [
+        ...this.files,
+        //이미지 업로드
+        {
+          //실제 파일
+          file: this.$refs.files.files[i],
+          //이미지 프리뷰
+          preview: URL.createObjectURL(this.$refs.files.files[i]),
+          //삭제및 관리를 위한 number
+          number: i + this.uploadImageIndex,
+        },
+      ];
+      num = i;
 
       /*mobilenet*/
       mobilenet.load().then((model) => {
         const image = document.getElementById("image");
         // Classify the image.
         model.classify(image).then((predictions) => {
-          // console.log(predictions);
+          console.log(predictions);
           this.analysis = `예상 이름 : ${predictions[0].className},
-            확률 : ${(predictions[0].probability * 100).toFixed(2)}%`;
+              확률 : ${(predictions[0].probability * 100).toFixed(2)}%`;
         });
       });
 
-      // fetch(this.files.preview)
-      //   .then((res) => res.blob())
-      //   .then((blob) => {
-      //     const reader = new FileReader();
-      //     reader.onload = () => {
-      //       const base64data = reader.result;
-      //       this.url = base64data;
-      //       console.log(this.url);
-      //     };
-      //     reader.readAsDataURL(blob);
-      //   });
+      /*base64*/
+      fetch(URL.createObjectURL(this.$refs.files.files[i]))
+        .then((res) => res.blob())
+        .then((blob) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64data = reader.result;
+            this.url = base64data;
+            console.log(this.url);
+          };
+          reader.readAsDataURL(blob);
+        });
+    }
+    this.uploadImageIndex = this.uploadImageIndex + num + 1;
+    // console.log(this.files);
+    // console.log(this.filesPreview);
+  },
 
-      axios({
-        url: "http://localhost:3000/about",
-        method: "POST", // 전송방식을 post로 지정
-        data: {
-          // file: this.url,
-          file: "제발",
-        },
-      }).then((res) => {
-        console.log("1");
-        alert(res.data.message);
-      });
-    },
+  // image_analysis: function () {},
 
-    imageAddUpload() {
-      console.log(this.$refs.files.files);
-
-      // this.files = [...this.files, this.$refs.files.files];
-      //하나의 배열로 넣기c
-      let num = -1;
-      for (let i = 0; i < this.$refs.files.files.length; i++) {
-        // console.log(this.uploadImageIndex);
-        this.files = [
-          ...this.files,
-          //이미지 업로드
-          {
-            //실제 파일
-            file: this.$refs.files.files[i],
-            //이미지 프리뷰
-            preview: URL.createObjectURL(this.$refs.files.files[i]),
-            //삭제및 관리를 위한 number
-            number: i + this.uploadImageIndex,
-          },
-        ];
-        num = i;
-      }
-      this.uploadImageIndex = this.uploadImageIndex + num + 1;
-      // console.log(this.files);
-      // console.log(this.filesPreview);
-    },
-
-    // image_analysis: function () {},
-
-    fileDeleteButton(e) {
-      const name = e.target.getAttribute("name");
-      this.files = this.files.filter((data) => data.number !== Number(name));
-      // console.log(this.files);
-    },
+  fileDeleteButton(e) {
+    const name = e.target.getAttribute("name");
+    this.files = this.files.filter((data) => data.number !== Number(name));
+    // console.log(this.files);
   },
 };
 </script>
 
 <style>
+.image_Data {
+  width: 1200px;
+  height: 400px;
+}
+
+.drop {
+  width: 500px;
+  height: 300px;
+}
+
 .main-container {
   width: 1200px;
   height: 400px;

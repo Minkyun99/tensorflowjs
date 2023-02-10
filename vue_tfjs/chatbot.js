@@ -1,3 +1,5 @@
+/*eslint-disable*/
+
 require("dotenv").config();
 const TelegramBot = require("node-telegram-bot-api");
 const { Configuration, OpenAIApi } = require("openai");
@@ -14,12 +16,15 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
   bot.sendMessage(chatId, resp);
 });
 
+import data from "./data.js";
+
 bot.on("message", async (msg) => {
   const response = await openai.createCompletion({
     model: "text-davinci-003",
     prompt: msg.text,
-    max_tokens: 1000,
-    temperature: 0.8,
+    max_tokens: 256,
+    temperature: 0.3,
+    data,
   });
   const chatId = msg.chat.id;
   const responseon = response.data.choices[0].text;

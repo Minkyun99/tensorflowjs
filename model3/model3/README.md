@@ -1,24 +1,20 @@
-# model3
 
-## Project setup
-```
-npm install
-```
+## 4) Ai를 활용한 통합 개발
+- 연계/소속회사 : 동성직업전문학교 3인 팀 프로젝트
+- 업무 기간 : 23.01.27~23.02.02
+- 주요 업무 : TensorFlow.js로 데이터 머신러닝, 결과 ppt 발표.
+- 담당 역할 : Vue.js를 사용하여 드래그 앤 드롭 기능으로 사진 업로드 구현, 업로드한 사진을 Mobile.net을 이용하여 어떤 사진인지 분석할 수 있도록 구현 
+- 기술 스택 : Node.js, Vue.js, TensorFlow.js, TensorFlow.js-Mobile.net, MongoDB
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+<Vue.js로 각 페이지 구성하기>
+1page
+1) 드래그 앤 드롭 기능으로 사진을 업로드
+2) 업로드한 사진을 Mobile.net으로 사진 분석
+(1)정체를 번역하여 한글로 표기(네이버 파파고 API 활용)
+(2) 확률 90%가 넘는 이미지는 분류
+(3) Base64를 이해하고, 사진을 Base64로 변환 후 MongoDB에 저장
+2page
+1) 제공된 엑셀파일을 업로드하고 분석버튼을 누르면 동작
+(Model Summary도 표현할 것)
+2) 데이터 훈련 시, 에포크와 손실율의 차트를 그리기
+3) 아버지와 자식의 유전적인 키의 상관관계를 학습하여 예측
